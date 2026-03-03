@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter/foundation.dart'; // penting untuk kIsWeb
-import 'dart:io' show Platform; // aman karena kita cek dulu kIsWeb
+import 'package:flutter/foundation.dart'; // penting untuk 
+import 'dart:io' show Platform; // aman karena kita cek dulu 
 
 void main() {
   runApp(const MainApp());
