@@ -33,4 +33,36 @@ class ApiService {
       "$baseUrl/movie/popular?api_key=$apiKey",
     );
   }
+  Future<List<Map<String, dynamic>>> searchMovies(String query) async {
+    final response = await http.get(
+      Uri.parse("$baseUrl/search/movie?api_key=$apiKey&query=$query"),
+    );
+    final data = json.decode(response.body);
+    return List<Map<String, dynamic>>.from(data['results']);
+  }
+
+  /// Mengambil video trailer untuk movie tertentu
+  Future<String?> getMovieVideos(int movieId) async {
+    try {
+      final response = await http.get(
+        Uri.parse("$baseUrl/movie/$movieId/videos?api_key=$apiKey"),
+      );
+      
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final List<dynamic> videos = data['results'];
+        
+        // Cari trailer YouTube pertama
+        for (var video in videos) {
+          if (video['site'] == 'YouTube' && video['type'] == 'Trailer') {
+            return video['key']; // Returns YouTube video key
+          }
+        }
+        return null;
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
 }
