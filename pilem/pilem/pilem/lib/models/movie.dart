@@ -28,6 +28,7 @@ class Movie {
       voteAverage: (json['vote_average'] ?? 0).toDouble(),
     );
   }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
