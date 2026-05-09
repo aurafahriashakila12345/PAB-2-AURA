@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "84094227270",
+    "project_id": "jadwalkuliah-27c98",
+    "storage_bucket": "jadwalkuliah-27c98.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:84094227270:android:6c1c0de80a6154a1580b47",
+        "android_client_info": {
+          "package_name": "com.example.jadwalkuliah"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDDRqmVbb__1JI8ZkPKuBjqmtylq7dp_a8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
