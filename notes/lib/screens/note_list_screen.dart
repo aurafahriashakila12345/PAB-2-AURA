@@ -1,9 +1,9 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import '../models/note.dart';
 import '../services/note_service.dart';
 import '../widgets/note_dialog.dart';
+import '../services/fcm_service.dart';
 
 class NoteListScreen extends StatefulWidget {
   const NoteListScreen({super.key});
@@ -14,7 +14,7 @@ class NoteListScreen extends StatefulWidget {
 
 class _NoteListScreenState extends State<NoteListScreen> {
   final NoteService _noteService = NoteService();
-
+  final FcmService _fcmService = FcmService(); // tambahan
   /// Show dialog to add a new note
   Future<void> _addNote() async {
     final note = await showDialog<Note>(
@@ -25,6 +25,13 @@ class _NoteListScreenState extends State<NoteListScreen> {
     if (note != null) {
       try {
         await _noteService.addNote(note);
+
+        //kiriim notifikasi
+         await _fcmService.sendNoteNotification(
+      title: note.title,
+      description: note.description,
+    );
+    
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
