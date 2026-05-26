@@ -1,33 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'l10n/app_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
-import 'screens/note_list_screen.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'firebase_options.dart';
+import 'screens/note_list_screen.dart';
 import 'services/fcm_service.dart';
 
-// Background message handler (must be top-level function)
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  debugPrint('Handling a background message: ${message.messageId}');
-  
-  // If it's a data-only message (no notification object), we manually show it
-  if (message.notification == null && message.data.isNotEmpty) {
-    final title = message.data['title'] ?? 'Notifikasi Baru';
-    final body = message.data['body'] ?? 'Klik untuk melihat detail';
 
-    final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-    
-    // We need to re-initialize for the background isolate
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
-    const initSettings = InitializationSettings(android: androidSettings);
-    await flutterLocalNotificationsPlugin.initialize(
-      settings: initSettings,
-    );
+  debugPrint('Handling background message: ${message.messageId}');
+
+  if (message.notification == null && message.data.isNotEmpty) {
+    final title = message.data['title'] ?? 'New Notification';
+    final body = message.data['body'] ?? 'Tap to view details';
 
     await flutterLocalNotificationsPlugin.show(
-      id: message.hashCode,
+      id: DateTime.now().millisecondsSinceEpoch % 100000,
       title: title,
       body: body,
       notificationDetails: const NotificationDetails(
@@ -43,31 +40,101 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   }
 }
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-   try {
-    // Inisialisasi Firebase agar seluruh service Firebase dapat digunakan
-    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-    
-    // Mendaftarkan background handler untuk menangani
-    // pesan FCM saat aplikasi berada di background/terminated
+
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+
+    const androidSettings = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
+
+    const initSettings = InitializationSettings(android: androidSettings);
+
+    await flutterLocalNotificationsPlugin.initialize(
+      settings: initSettings,
+    );
+
+    final token = await FirebaseMessaging.instance.getToken();
+    debugPrint('FCM TOKEN: $token');
+
+    final notifSettings = await FirebaseMessaging.instance.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+    debugPrint('Permission status: ${notifSettings.authorizationStatus}');
+
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-    // Inisialisasi service FCM
-    // Dijalankan async agar startup aplikasi lebih cepat
-    FcmService().initialize().catchError((e) {
-      // Menangkap error khusus saat proses inisialisasi FCM
-      debugPrint('Error initializing FCM: $e');
+    await FcmService().initialize();
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+      debugPrint('Foreground message: ${message.notification?.title}');
+
+      if (message.notification != null) {
+        await flutterLocalNotificationsPlugin.show(
+          id: DateTime.now().millisecondsSinceEpoch % 100000,
+          title: message.notification?.title ?? 'Notification',
+          body: message.notification?.body ?? '',
+          notificationDetails: const NotificationDetails(
+            android: AndroidNotificationDetails(
+              'high_importance_channel',
+              'High Importance Notifications',
+              importance: Importance.max,
+              priority: Priority.high,
+              icon: '@mipmap/ic_launcher',
+            ),
+          ),
+        );
+      }
     });
   } catch (e) {
-    // Menangkap error saat proses inisialisasi Firebase
-    debugPrint('Error during Firebase initialization: $e');
+    debugPrint('Firebase init error: $e');
   }
-  runApp(const MainApp());
+
+  final prefs = await SharedPreferences.getInstance();
+  final savedLocale = prefs.getString('app_locale') ?? 'id';
+
+  runApp(MainApp(initialLocale: Locale(savedLocale)));
 }
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+class MainApp extends StatefulWidget {
+  final Locale initialLocale;
+
+  const MainApp({super.key, required this.initialLocale});
+
+  static _MainAppState? _instance;
+
+  static Future<void> setLocale(Locale locale) async {
+    await _instance?._setLocale(locale);
+  }
+
+  @override
+  State<MainApp> createState() => _MainAppState();
+}
+
+class _MainAppState extends State<MainApp> {
+  late Locale _locale;
+
+  @override
+  void initState() {
+    super.initState();
+    _locale = widget.initialLocale;
+    MainApp._instance = this;
+  }
+
+  Future<void> _setLocale(Locale locale) async {
+    setState(() {
+      _locale = locale;
+    });
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('app_locale', locale.languageCode);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,6 +142,22 @@ class MainApp extends StatelessWidget {
       title: 'My Notes',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(colorSchemeSeed: Colors.deepPurple, useMaterial3: true),
+      locale: _locale,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
+      localeResolutionCallback: (locale, supportedLocales) {
+        for (final supportedLocale in supportedLocales) {
+          if (supportedLocale.languageCode == locale?.languageCode) {
+            return supportedLocale;
+          }
+        }
+        return supportedLocales.first;
+      },
       home: const NoteListScreen(),
     );
   }

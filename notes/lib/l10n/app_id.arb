@@ -1,0 +1,147 @@
+{
+  "@@locale": "id",
+  "appTitle": "Catatan Saya",
+  "@appTitle": {
+    "description": "Judul aplikasi"
+  },
+  "addNote": "Tambah Catatan",
+  "@addNote": {
+    "description": "Label untuk menambah catatan"
+  },
+  "editNote": "Edit Catatan",
+  "@editNote": {
+    "description": "Label untuk mengedit catatan"
+  },
+  "deleteNote": "Hapus Catatan",
+  "@deleteNote": {
+    "description": "Label untuk menghapus catatan"
+  },
+  "title": "Judul",
+  "@title": {
+    "description": "Label untuk field judul"
+  },
+  "description": "Deskripsi",
+  "@description": {
+    "description": "Label untuk field deskripsi"
+  },
+  "cancel": "Batal",
+  "@cancel": {
+    "description": "Label untuk tombol batal"
+  },
+  "save": "Simpan",
+  "@save": {
+    "description": "Label untuk tombol simpan"
+  },
+  "add": "Tambah",
+  "@add": {
+    "description": "Label untuk tombol tambah"
+  },
+  "noNotes": "Belum ada catatan",
+  "@noNotes": {
+    "description": "Pesan saat tidak ada catatan"
+  },
+  "addFirstNote": "Tekan tombol + untuk menambahkan catatan",
+  "@addFirstNote": {
+    "description": "Instruksi untuk menambah catatan pertama"
+  },
+  "noteAdded": "Catatan berhasil ditambahkan",
+  "@noteAdded": {
+    "description": "Pesan sukses saat catatan ditambahkan"
+  },
+  "noteUpdated": "Catatan berhasil diupdate",
+  "@noteUpdated": {
+    "description": "Pesan sukses saat catatan diupdate"
+  },
+  "noteDeleted": "Catatan berhasil dihapus",
+  "@noteDeleted": {
+    "description": "Pesan sukses saat catatan dihapus"
+  },
+  "deleteConfirm": "Apakah Anda yakin ingin menghapus \"{title}\"?",
+  "@deleteConfirm": {
+    "description": "Pesan konfirmasi sebelum menghapus catatan",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "titleRequired": "Judul tidak boleh kosong",
+  "@titleRequired": {
+    "description": "Pesan validasi untuk judul kosong"
+  },
+  "descriptionRequired": "Deskripsi tidak boleh kosong",
+  "@descriptionRequired": {
+    "description": "Pesan validasi untuk deskripsi kosong"
+  },
+  "tapToAddImage": "Ketuk untuk menambah gambar",
+  "@tapToAddImage": {
+    "description": "Label untuk pemilih gambar"
+  },
+  "changeImage": "Ganti Gambar",
+  "@changeImage": {
+    "description": "Label untuk tombol ganti gambar"
+  },
+  "error": "Terjadi kesalahan",
+  "@error": {
+    "description": "Pesan error umum"
+  },
+  "delete": "Hapus",
+  "@delete": {
+    "description": "Label untuk tombol hapus"
+  },
+  "language": "Bahasa",
+  "@language": {
+    "description": "Label untuk pemilih bahasa"
+  },
+  "languageIndonesian": "Indonesia",
+  "@languageIndonesian": {
+    "description": "Label untuk pilihan Bahasa Indonesia"
+  },
+  "languageEnglish": "Inggris",
+  "@languageEnglish": {
+    "description": "Label untuk pilihan Bahasa Inggris"
+  },
+  "copyFcmToken": "Salin Token FCM",
+  "@copyFcmToken": {
+    "description": "Tooltip untuk tombol salin token FCM"
+  },
+  "fcmTokenCopied": "Token FCM disalin ke clipboard",
+  "@fcmTokenCopied": {
+    "description": "Pesan saat token FCM disalin"
+  },
+  "errorOccurred": "Terjadi kesalahan",
+  "@errorOccurred": {
+    "description": "Judul state error"
+  },
+  "addNoteHint": "Tekan tombol + untuk menambahkan catatan",
+  "@addNoteHint": {
+    "description": "Teks petunjuk di state kosong"
+  },
+  "noteAddFailed": "Gagal menambahkan catatan: {error}",
+  "@noteAddFailed": {
+    "description": "Pesan error saat gagal menambah catatan",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "noteUpdateFailed": "Gagal mengupdate catatan: {error}",
+  "@noteUpdateFailed": {
+    "description": "Pesan error saat gagal mengupdate catatan",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "noteDeleteFailed": "Gagal menghapus catatan: {error}",
+  "@noteDeleteFailed": {
+    "description": "Pesan error saat gagal menghapus catatan",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  }
+}

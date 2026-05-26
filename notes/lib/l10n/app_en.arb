@@ -1,0 +1,147 @@
+{
+  "@@locale": "en",
+  "appTitle": "My Notes",
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  "addNote": "Add Note",
+  "@addNote": {
+    "description": "Label for adding a note"
+  },
+  "editNote": "Edit Note",
+  "@editNote": {
+    "description": "Label for editing a note"
+  },
+  "deleteNote": "Delete Note",
+  "@deleteNote": {
+    "description": "Label for deleting a note"
+  },
+  "title": "Title",
+  "@title": {
+    "description": "Label for the title field"
+  },
+  "description": "Description",
+  "@description": {
+    "description": "Label for the description field"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Label for cancel button"
+  },
+  "save": "Save",
+  "@save": {
+    "description": "Label for save button"
+  },
+  "add": "Add",
+  "@add": {
+    "description": "Label for add button"
+  },
+  "noNotes": "No notes yet",
+  "@noNotes": {
+    "description": "Message when there are no notes"
+  },
+  "addFirstNote": "Tap + button to add a note",
+  "@addFirstNote": {
+    "description": "Instruction to add first note"
+  },
+  "noteAdded": "Note added successfully",
+  "@noteAdded": {
+    "description": "Success message when note is added"
+  },
+  "noteUpdated": "Note updated successfully",
+  "@noteUpdated": {
+    "description": "Success message when note is updated"
+  },
+  "noteDeleted": "Note deleted successfully",
+  "@noteDeleted": {
+    "description": "Success message when note is deleted"
+  },
+  "deleteConfirm": "Are you sure you want to delete \"{title}\"?",
+  "@deleteConfirm": {
+    "description": "Confirmation message before deleting a note",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "titleRequired": "Title cannot be empty",
+  "@titleRequired": {
+    "description": "Validation message for empty title"
+  },
+  "descriptionRequired": "Description cannot be empty",
+  "@descriptionRequired": {
+    "description": "Validation message for empty description"
+  },
+  "tapToAddImage": "Tap to add image",
+  "@tapToAddImage": {
+    "description": "Label for image picker"
+  },
+  "changeImage": "Change Image",
+  "@changeImage": {
+    "description": "Label for change image button"
+  },
+  "error": "An error occurred",
+  "@error": {
+    "description": "Generic error message"
+  },
+  "delete": "Delete",
+  "@delete": {
+    "description": "Label for delete button"
+  },
+  "language": "Language",
+  "@language": {
+    "description": "Label for language selector"
+  },
+  "languageIndonesian": "Indonesian",
+  "@languageIndonesian": {
+    "description": "Label for Indonesian language option"
+  },
+  "languageEnglish": "English",
+  "@languageEnglish": {
+    "description": "Label for English language option"
+  },
+  "copyFcmToken": "Copy FCM Token",
+  "@copyFcmToken": {
+    "description": "Tooltip for copy FCM token button"
+  },
+  "fcmTokenCopied": "FCM Token copied to clipboard",
+  "@fcmTokenCopied": {
+    "description": "Message when FCM token is copied"
+  },
+  "errorOccurred": "An error occurred",
+  "@errorOccurred": {
+    "description": "Error state title"
+  },
+  "addNoteHint": "Tap + button to add a note",
+  "@addNoteHint": {
+    "description": "Hint text in empty state"
+  },
+  "noteAddFailed": "Failed to add note: {error}",
+  "@noteAddFailed": {
+    "description": "Error message when adding note fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "noteUpdateFailed": "Failed to update note: {error}",
+  "@noteUpdateFailed": {
+    "description": "Error message when updating note fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "noteDeleteFailed": "Failed to delete note: {error}",
+  "@noteDeleteFailed": {
+    "description": "Error message when deleting note fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  }
+}

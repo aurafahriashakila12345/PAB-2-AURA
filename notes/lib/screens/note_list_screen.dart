@@ -1,9 +1,15 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+
 import '../models/note.dart';
 import '../services/note_service.dart';
-import '../widgets/note_dialog.dart';
 import '../services/fcm_service.dart';
+import '../widgets/note_dialog.dart';
+import '../l10n/app_localizations.dart';
+import '../main.dart';
 
 class NoteListScreen extends StatefulWidget {
   const NoteListScreen({super.key});
@@ -14,9 +20,12 @@ class NoteListScreen extends StatefulWidget {
 
 class _NoteListScreenState extends State<NoteListScreen> {
   final NoteService _noteService = NoteService();
-  final FcmService _fcmService = FcmService(); // tambahan
-  /// Show dialog to add a new note
+
+  final FcmService _fcmService = FcmService();
+
   Future<void> _addNote() async {
+    final l10n = AppLocalizations.of(context)!;
+
     final note = await showDialog<Note>(
       context: context,
       builder: (context) => const NoteDialog(),
@@ -26,16 +35,15 @@ class _NoteListScreenState extends State<NoteListScreen> {
       try {
         await _noteService.addNote(note);
 
-        //kiriim notifikasi
-         await _fcmService.sendNoteNotification(
-      title: note.title,
-      description: note.description,
-    );
-    
+        await _fcmService.sendNoteNotification(
+          title: note.title,
+          description: note.description,
+        );
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Note berhasil ditambahkan'),
+            SnackBar(
+              content: Text(l10n.noteAdded),
               backgroundColor: Colors.green,
             ),
           );
@@ -44,7 +52,7 @@ class _NoteListScreenState extends State<NoteListScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Gagal menambahkan note: $e'),
+              content: Text(l10n.noteAddFailed(e.toString())),
               backgroundColor: Colors.red,
             ),
           );
@@ -53,8 +61,9 @@ class _NoteListScreenState extends State<NoteListScreen> {
     }
   }
 
-  /// Show dialog to edit an existing note
   Future<void> _editNote(Note note) async {
+    final l10n = AppLocalizations.of(context)!;
+
     final updatedNote = await showDialog<Note>(
       context: context,
       builder: (context) => NoteDialog(note: note),
@@ -63,10 +72,11 @@ class _NoteListScreenState extends State<NoteListScreen> {
     if (updatedNote != null) {
       try {
         await _noteService.updateNote(updatedNote);
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Note berhasil diupdate'),
+            SnackBar(
+              content: Text(l10n.noteUpdated),
               backgroundColor: Colors.green,
             ),
           );
@@ -75,7 +85,7 @@ class _NoteListScreenState extends State<NoteListScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Gagal mengupdate note: $e'),
+              content: Text(l10n.noteUpdateFailed(e.toString())),
               backgroundColor: Colors.red,
             ),
           );
@@ -84,26 +94,27 @@ class _NoteListScreenState extends State<NoteListScreen> {
     }
   }
 
-  /// Show confirmation dialog and delete a note
   Future<void> _deleteNote(Note note) async {
+    final l10n = AppLocalizations.of(context)!;
+
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Hapus Note'),
-        content: Text('Apakah Anda yakin ingin menghapus "${note.title}"?'),
+        title: Text(l10n.deleteNote),
+        content: Text(l10n.deleteConfirm(note.title)),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Batal'),
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(true),
+            onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Hapus'),
+            child: Text(l10n.delete),
           ),
         ],
       ),
@@ -112,10 +123,11 @@ class _NoteListScreenState extends State<NoteListScreen> {
     if (confirm == true && note.id != null) {
       try {
         await _noteService.deleteNote(note.id!);
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Note berhasil dihapus'),
+            SnackBar(
+              content: Text(l10n.noteDeleted),
               backgroundColor: Colors.green,
             ),
           );
@@ -124,7 +136,7 @@ class _NoteListScreenState extends State<NoteListScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Gagal menghapus note: $e'),
+              content: Text(l10n.noteDeleteFailed(e.toString())),
               backgroundColor: Colors.red,
             ),
           );
@@ -133,7 +145,6 @@ class _NoteListScreenState extends State<NoteListScreen> {
     }
   }
 
-  /// Format date to readable string
   String _formatDate(DateTime date) {
     final months = [
       'Jan',
@@ -149,25 +160,90 @@ class _NoteListScreenState extends State<NoteListScreen> {
       'Nov',
       'Dec',
     ];
-    return '${date.day} ${months[date.month - 1]} ${date.year}, '
+
+    return '${date.day} '
+        '${months[date.month - 1]} '
+        '${date.year}, '
         '${date.hour.toString().padLeft(2, '0')}:'
         '${date.minute.toString().padLeft(2, '0')}';
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Row(
-          children: [
-            Icon(Icons.sticky_note_2, color: Colors.white),
-            SizedBox(width: 8),
-            Text('My Notes'),
-          ],
-        ),
         backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
         elevation: 0,
+        title: Row(
+          children: [
+            const Icon(Icons.sticky_note_2),
+            const SizedBox(width: 8),
+            Text(l10n.appTitle),
+          ],
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.language),
+            tooltip: l10n.language,
+            onPressed: () {
+              showModalBottomSheet(
+                context: context,
+                builder: (context) {
+                  return SafeArea(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ListTile(
+                          leading: const Text(
+                            '🇮🇩',
+                            style: TextStyle(fontSize: 24),
+                          ),
+                          title: Text(l10n.languageIndonesian),
+                          onTap: () {
+                            MainApp.setLocale(const Locale('id'));
+
+                            Navigator.pop(context);
+                          },
+                        ),
+                        ListTile(
+                          leading: const Text(
+                            '🇺🇸',
+                            style: TextStyle(fontSize: 24),
+                          ),
+                          title: Text(l10n.languageEnglish),
+                          onTap: () {
+                            MainApp.setLocale(const Locale('en'));
+
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.copy),
+            tooltip: l10n.copyFcmToken,
+            onPressed: () async {
+              final messenger = ScaffoldMessenger.of(context);
+              final copiedMsg = l10n.fcmTokenCopied;
+
+              final token = await FirebaseMessaging.instance.getToken();
+
+              if (token != null) {
+                await Clipboard.setData(ClipboardData(text: token));
+                debugPrint('FCM Token: $token');
+                messenger.showSnackBar(SnackBar(content: Text(copiedMsg)));
+              }
+            },
+          ),
+        ],
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -180,36 +256,26 @@ class _NoteListScreenState extends State<NoteListScreen> {
         child: StreamBuilder<List<Note>>(
           stream: _noteService.getNotes(),
           builder: (context, snapshot) {
-            // Loading state
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             }
 
-            // Error state
             if (snapshot.hasError) {
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.error_outline,
-                      size: 64,
-                      color: Colors.red.shade300,
-                    ),
+                    Icon(Icons.error, size: 64, color: Colors.red.shade300),
                     const SizedBox(height: 16),
                     Text(
-                      'Terjadi kesalahan',
+                      l10n.errorOccurred,
                       style: TextStyle(
                         fontSize: 18,
                         color: Colors.grey.shade700,
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Text(
-                      '${snapshot.error}',
-                      style: TextStyle(color: Colors.grey.shade500),
-                      textAlign: TextAlign.center,
-                    ),
+                    Text('${snapshot.error}', textAlign: TextAlign.center),
                   ],
                 ),
               );
@@ -217,7 +283,6 @@ class _NoteListScreenState extends State<NoteListScreen> {
 
             final notes = snapshot.data ?? [];
 
-            // Empty state
             if (notes.isEmpty) {
               return Center(
                 child: Column(
@@ -230,32 +295,29 @@ class _NoteListScreenState extends State<NoteListScreen> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Belum ada catatan',
+                      l10n.noNotes,
                       style: TextStyle(
                         fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey.shade600,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey.shade700,
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Tekan tombol + untuk menambahkan catatan',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey.shade400,
-                      ),
+                      l10n.addNoteHint,
+                      style: TextStyle(color: Colors.grey.shade500),
                     ),
                   ],
                 ),
               );
             }
 
-            // Notes list
             return ListView.builder(
               padding: const EdgeInsets.all(16),
               itemCount: notes.length,
               itemBuilder: (context, index) {
                 final note = notes[index];
+
                 return _buildNoteCard(note);
               },
             );
@@ -271,16 +333,14 @@ class _NoteListScreenState extends State<NoteListScreen> {
     );
   }
 
-  /// Build a single note card
   Widget _buildNoteCard(Note note) {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
-      elevation: 2,
+      elevation: 3,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Image (if available)
           if (note.imageBase64 != null && note.imageBase64!.isNotEmpty)
             ClipRRect(
               borderRadius: const BorderRadius.vertical(
@@ -288,27 +348,16 @@ class _NoteListScreenState extends State<NoteListScreen> {
               ),
               child: Image.memory(
                 base64Decode(note.imageBase64!),
-                height: 200,
+                height: 220,
                 width: double.infinity,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    height: 100,
-                    color: Colors.grey.shade200,
-                    child: const Center(
-                      child: Icon(Icons.broken_image, color: Colors.grey),
-                    ),
-                  );
-                },
               ),
             ),
-
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Title
                 Text(
                   note.title,
                   style: const TextStyle(
@@ -317,55 +366,40 @@ class _NoteListScreenState extends State<NoteListScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-
-                // Description
                 Text(
                   note.description,
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey.shade700,
-                    height: 1.4,
+                    height: 1.5,
                   ),
                 ),
-                const SizedBox(height: 12),
-
-                // Footer: date + action buttons
+                const SizedBox(height: 16),
                 Row(
                   children: [
                     Icon(
                       Icons.access_time,
                       size: 14,
-                      color: Colors.grey.shade400,
+                      color: Colors.grey.shade500,
                     ),
                     const SizedBox(width: 4),
                     Text(
                       _formatDate(note.createdAt),
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.grey.shade400,
+                        color: Colors.grey.shade500,
                       ),
                     ),
                     const Spacer(),
-                    // Edit Button
                     IconButton(
                       onPressed: () => _editNote(note),
-                      icon: const Icon(Icons.edit_outlined),
+                      icon: const Icon(Icons.edit),
                       color: Colors.deepPurple,
-                      iconSize: 20,
-                      tooltip: 'Edit',
-                      constraints: const BoxConstraints(),
-                      padding: const EdgeInsets.all(8),
                     ),
-                    const SizedBox(width: 4),
-                    // Delete Button
                     IconButton(
                       onPressed: () => _deleteNote(note),
-                      icon: const Icon(Icons.delete_outline),
+                      icon: const Icon(Icons.delete),
                       color: Colors.red,
-                      iconSize: 20,
-                      tooltip: 'Hapus',
-                      constraints: const BoxConstraints(),
-                      padding: const EdgeInsets.all(8),
                     ),
                   ],
                 ),
